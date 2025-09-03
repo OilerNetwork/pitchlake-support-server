@@ -6,7 +6,6 @@ import {
 } from "starknet";
 import { ABI as VaultAbi } from "../../abi/vault";
 import { ABI as OptionRoundAbi } from "../../abi/optionRound";
-import { StateTransitionConfig } from "./config";
 import { OptionRoundState } from "../../shared/types";
 
 export interface RoundInfo {

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { FossilRequest } from "../../shared/types";
-import { StateTransitionConfig } from "./config";
 
 export interface FossilApiRequest {
   identifiers: string[];

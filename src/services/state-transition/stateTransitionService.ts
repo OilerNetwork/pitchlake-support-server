@@ -1,5 +1,4 @@
 import { Logger } from "winston";
-import { StateTransitionConfig, loadStateTransitionConfig } from "./config";
 import { StarkNetClient } from "./starknetClient";
 import { FossilApiService } from "./fossilApiService";
 import { StateHandler } from "./stateHandler";
@@ -18,7 +17,7 @@ export class StateTransitionService {
   ) {
     this.vaultAddress = vaultAddress;
     this.logger = logger;
-    this.config = loadStateTransitionConfig();
+    this.config = this.loadConfig();
     this.starknetClient = new StarkNetClient(this.config);
     this.fossilApiService = new FossilApiService(this.config);
     this.stateHandler = new StateHandler(this.starknetClient, this.fossilApiService, logger);
@@ -27,6 +26,32 @@ export class StateTransitionService {
   getVaultAddress(): string {
     return this.vaultAddress;
   }
+
+  loadConfig(): StateTransitionConfig {
+    const {
+      STARKNET_RPC,
+      STARKNET_PRIVATE_KEY,
+      STARKNET_ACCOUNT_ADDRESS,
+      VAULT_ADDRESSES,
+      FOSSIL_API_KEY,
+      FOSSIL_API_URL
+    } = process.env;
+  
+    if (!STARKNET_RPC || !STARKNET_PRIVATE_KEY || !STARKNET_ACCOUNT_ADDRESS || !VAULT_ADDRESSES || !FOSSIL_API_KEY || !FOSSIL_API_URL) {
+      throw new Error("Missing required environment variables for state transition service");
+    }
+  
+    const vaultAddresses = VAULT_ADDRESSES.split(',').map(addr => addr.trim());
+  
+    return {
+      starknetRpcUrl: STARKNET_RPC,
+      starknetPrivateKey: STARKNET_PRIVATE_KEY,
+      starknetAccountAddress: STARKNET_ACCOUNT_ADDRESS,
+      fossilApiKey: FOSSIL_API_KEY,
+      fossilApiUrl: FOSSIL_API_URL,
+      vaultAddresses
+    };
+  } 
 
   async checkAndTransition(): Promise<void> {
     try {
