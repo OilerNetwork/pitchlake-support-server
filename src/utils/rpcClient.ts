@@ -1,11 +1,11 @@
 import { createPublicClient, http, PublicClient } from "viem";
 import { mainnet } from "viem/chains";
-import { UnconfirmedIndexerConfig } from "./config";
+import { RPCConfig } from "../shared/types";
 
-export class UnconfirmedRPCClient {
+export class RPCClient {
   private client: PublicClient;
 
-  constructor(config: UnconfirmedIndexerConfig) {
+  constructor(config: RPCConfig) {
     this.client = createPublicClient({
       chain: mainnet,
       transport: http(config.mainnetRpcUrl),

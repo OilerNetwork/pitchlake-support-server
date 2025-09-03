@@ -1,7 +1,7 @@
 import * as dotenv from "dotenv";
 import { setupLogger } from './shared/logger';
 import * as cron from 'node-cron';
-import { Runner } from './services/runner';
+import { UnconfirmedTWAPsRunner } from "./services/unconfirmed-twaps";
 import { scheduleStateTransition, StateTransitionService } from './services/transition';
 
 dotenv.config()
@@ -45,45 +45,41 @@ class ArchitectureSupportServer {
     logger.info('Running in demo mode - skipping StarkNet service initialization');
   } else {
     // Check required environment variables for production mode
-    if (!STARKNET_RPC || !STARKNET_PRIVATE_KEY || !STARKNET_ACCOUNT_ADDRESS || !VAULT_ADDRESSES || !FOSSIL_API_KEY || !FOSSIL_API_URL) {
-        throw new Error("Missing required environment variables");
-    }
-    // Validate cron schedule
-    if (!CRON_SCHEDULE || !cron.validate(CRON_SCHEDULE as string)) {
-        throw new Error(`Invalid cron schedule: ${CRON_SCHEDULE}`);
-    }
-    const vaultAddresses = VAULT_ADDRESSES.split(',').map(addr => addr.trim());
+    // if (!STARKNET_RPC || !STARKNET_PRIVATE_KEY || !STARKNET_ACCOUNT_ADDRESS || !VAULT_ADDRESSES || !FOSSIL_API_KEY || !FOSSIL_API_URL) {
+    //     throw new Error("Missing required environment variables");
+    // }
+    // // Validate cron schedule
+    // if (!CRON_SCHEDULE || !cron.validate(CRON_SCHEDULE as string)) {
+    //     throw new Error(`Invalid cron schedule: ${CRON_SCHEDULE}`);
+    // }
+    // const vaultAddresses = VAULT_ADDRESSES.split(',').map(addr => addr.trim());
     
-    // Create services for each vault
-    services = vaultAddresses.map(vaultAddress => {
-        const logger = setupLogger(`Vault ${vaultAddress.slice(0, 7)}`);
-        return new StateTransitionService(
-            STARKNET_RPC,
-            STARKNET_PRIVATE_KEY,
-            STARKNET_ACCOUNT_ADDRESS,
-            vaultAddress,
-            FOSSIL_API_KEY,
-            FOSSIL_API_URL,
-            logger
-        )
-    });
-    cron.schedule(CRON_SCHEDULE as string, scheduleStateTransition(services, logger) );
+    // // Create services for each vault
+    // services = vaultAddresses.map(vaultAddress => {
+    //     const logger = setupLogger(`Vault ${vaultAddress.slice(0, 7)}`);
+    //     return new StateTransitionService(
+    //         STARKNET_RPC,
+    //         STARKNET_PRIVATE_KEY,
+    //         STARKNET_ACCOUNT_ADDRESS,
+    //         vaultAddress,
+    //         FOSSIL_API_KEY,
+    //         FOSSIL_API_URL,
+    //         logger
+    //     )
+    // });
+    // cron.schedule(CRON_SCHEDULE as string, scheduleStateTransition(services, logger) );
   }
   
-    const runner = new Runner();
+    const runner = new UnconfirmedTWAPsRunner();
     try {
       logger.info('Starting Architecture Support Server...');
 
       // Start all services
       await Promise.all([
-       
+        runner.initialize()
       ]);
 
       logger.info('All services started successfully');
-      let shouldRecalibrate = true;
-      while(shouldRecalibrate) {
-        shouldRecalibrate = await runner.initialize();
-      }
       runner.startListening();
 
       // Handle graceful shutdown

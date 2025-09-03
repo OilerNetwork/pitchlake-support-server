@@ -9,42 +9,46 @@ export class DB {
     if (process.env.USE_DEMO_DATA === 'true') {
       // In demo mode, create mock pools or use fallback connection strings
       const fallbackFossilUrl = process.env.FOSSIL_DB_URL || 'postgresql://demo:demo@localhost:5432/fossil_demo';
-      const fallbackPitchlakeUrl = process.env.DATABASE_URL || 'postgresql://demo:demo@localhost:5432/pitchlake_demo';
+      const fallbackPitchlakeUrl = process.env.PITCHLAKE_DB_URL || 'postgresql://demo:demo@localhost:5433/pitchlake_demo';
       
       this.fossilPool = new Pool({
         connectionString: fallbackFossilUrl,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: this.getSSLConfig(fallbackFossilUrl),
       });
       this.pitchlakePool = new Pool({
         connectionString: fallbackPitchlakeUrl,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: this.getSSLConfig(fallbackPitchlakeUrl),
       });
     } else {
       // Production mode - require the database URLs
       if (!process.env.FOSSIL_DB_URL) {
         throw new Error("FOSSIL_DB_URL is required in production mode");
       }
-      if (!process.env.DATABASE_URL) {
-        throw new Error("DATABASE_URL is required in production mode");
+      if (!process.env.PITCHLAKE_DB_URL) {
+        throw new Error("PITCHLAKE_DB_URL is required in production mode");
       }
       
       this.fossilPool = new Pool({
         connectionString: process.env.FOSSIL_DB_URL,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        ssl: this.getSSLConfig(process.env.FOSSIL_DB_URL),
       });
       this.pitchlakePool = new Pool({
-        connectionString: process.env.DATABASE_URL,
-        ssl: {
-          rejectUnauthorized: false,
-        },
+        connectionString: process.env.PITCHLAKE_DB_URL,
+        ssl: this.getSSLConfig(process.env.PITCHLAKE_DB_URL),
       });
     }
+  }
+
+  private getSSLConfig(connectionString: string) {
+    // For localhost connections, don't use SSL
+    if (connectionString.includes('localhost') || connectionString.includes('127.0.0.1')) {
+      return false;
+    }
+    
+    // For production/remote connections, use SSL with rejectUnauthorized: false
+    return {
+      rejectUnauthorized: false,
+    };
   }
   async shutdown() {
     await this.fossilPool.end();

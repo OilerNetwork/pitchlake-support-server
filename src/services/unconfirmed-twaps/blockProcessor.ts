@@ -66,7 +66,6 @@ export class UnconfirmedBlockProcessor {
           const needsRecalibration = await this.processBlock(block);
           console.log("Needs recalibration", needsRecalibration);
           if (needsRecalibration) {
-            console.log("THIS");
             await this.recalibrate();
             return true; // Start over from getInitialState
           }
