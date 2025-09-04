@@ -2,7 +2,7 @@ import { Logger } from "winston";
 import { StarkNetClient } from "./starknetClient";
 import { FossilApiService } from "./fossilApiService";
 import { StateHandler } from "./stateHandler";
-
+import { StateTransitionConfig } from "@/types/types";
 export class StateTransitionService {
   private logger: Logger;
   private config: StateTransitionConfig;
@@ -82,3 +82,4 @@ export class StateTransitionService {
     }
   }
 } 
+

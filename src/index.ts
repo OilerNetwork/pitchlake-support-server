@@ -2,7 +2,7 @@ import * as dotenv from "dotenv";
 import { setupLogger } from './shared/logger';
 import * as cron from 'node-cron';
 import { UnconfirmedTWAPsRunner } from "./services/unconfirmed-twaps";
-import { scheduleStateTransition, StateTransitionService } from './services/transition';
+import { runStateTransition } from "./services/scheduler/scheduler";
 
 dotenv.config()
 const logger = setupLogger('Main');
@@ -27,45 +27,28 @@ class ArchitectureSupportServer {
 
   async start(): Promise<void> {
     const {
-      USE_DEMO_DATA
+      USE_DEMO_DATA,
+      CRON_SCHEDULE_STATE,
   } = process.env;
   
   // Validate environment variables and set up services
-  
-  // Check if we're in demo mode
-  if (USE_DEMO_DATA === 'true') {
-    logger.info('Running in demo mode - skipping StarkNet service initialization');
-  } else {
-    
-    const vaultAddresses = VAULT_ADDRESSES.split(',').map(addr => addr.trim());
-    
-    // Create services for each vault
-    services = vaultAddresses.map(vaultAddress => {
-        const logger = setupLogger(`Vault ${vaultAddress.slice(0, 7)}`);
-        return new StateTransitionService(
-            STARKNET_RPC,
-            STARKNET_PRIVATE_KEY,
-            STARKNET_ACCOUNT_ADDRESS,
-            vaultAddress,
-            FOSSIL_API_KEY,
-            FOSSIL_API_URL,
-            logger
-        )
-    });
-    cron.schedule(CRON_SCHEDULE as string, scheduleStateTransition(services, logger) );
-  }
   
     const runner = new UnconfirmedTWAPsRunner();
     try {
       logger.info('Starting Architecture Support Server...');
 
-      // Start all services
+      // Start all services, if a scheduled job should auto run on startup, add it here
       await Promise.all([
-        runner.initialize()
+        runner.initialize(),
+        runStateTransition(logger)()
       ]);
 
       logger.info('All services started successfully');
       runner.startListening();
+
+      //Schedule cron
+      cron.schedule(CRON_SCHEDULE_STATE as string, runStateTransition(logger) );
+      
 
       // Handle graceful shutdown
       this.setupGracefulShutdown();
