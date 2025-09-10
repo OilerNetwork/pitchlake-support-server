@@ -1,7 +1,5 @@
-export { RefactoredUnconfirmedRunner } from './refactoredRunner';
-export { UnconfirmedBlockProcessor } from './blockProcessor';
+export { UnconfirmedTWAPsRunner } from './runner';
 export { UnconfirmedTWAPService } from './twapService';
-export { UnconfirmedRPCClient } from './rpcClient';
-export { UnconfirmedIndexerConfig, loadUnconfirmedIndexerConfig, TWAP_RANGES } from './config';
-export type { TWAPResult, BlockData } from './twapService';
-export type { ProcessedBlock } from './blockProcessor'; 
+export { UnconfirmedBlockProcessor } from './blockProcessor';
+export { loadUnconfirmedIndexerConfig } from './config';
+export type { UnconfirmedIndexerConfig } from './config'; 

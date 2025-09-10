@@ -1,28 +1,20 @@
-import { 
-  Contract, 
-  RpcProvider, 
-  Account,
-  CairoCustomEnum,
-} from "starknet";
+import { Contract, RpcProvider, Account } from "starknet";
 import { ABI as VaultAbi } from "../../abi/vault";
 import { ABI as OptionRoundAbi } from "../../abi/optionRound";
-import { StateTransitionConfig } from "./config";
-import { OptionRoundState } from "../../shared/types";
+import { StateTransitionConfig } from "@/types/types";
+
 
 export interface RoundInfo {
-  roundId: bigint;
-  roundAddress: string;
+  roundId: number;
   roundAddressHex: string;
-  state: OptionRoundState;
+  state: number;
 }
 
 export class StarkNetClient {
   private provider: RpcProvider;
   private account: Account;
-  private config: StateTransitionConfig;
 
   constructor(config: StateTransitionConfig) {
-    this.config = config;
     this.provider = new RpcProvider({ nodeUrl: config.starknetRpcUrl });
     this.account = new Account(
       this.provider,
@@ -31,69 +23,67 @@ export class StarkNetClient {
     );
   }
 
-  getProvider(): RpcProvider {
-    return this.provider;
-  }
-
-  getAccount(): Account {
-    return this.account;
-  }
-
   createVaultContract(vaultAddress: string): Contract {
-    return new Contract(
-      VaultAbi,
-      vaultAddress,
-      this.account
-    );
+    return new Contract(VaultAbi, vaultAddress, this.provider);
   }
 
-  createRoundContract(roundAddressHex: string): Contract {
-    return new Contract(
-      OptionRoundAbi,
-      roundAddressHex,
-      this.account
-    );
-  }
-
-  async getLatestBlockTimestamp(): Promise<number> {
-    const latestBlock = await this.provider.getBlock('latest');
-    return Number(latestBlock.timestamp);
+  createRoundContract(roundAddress: string): Contract {
+    return new Contract(OptionRoundAbi, roundAddress, this.provider);
   }
 
   async getRoundInfo(vaultContract: Contract): Promise<RoundInfo> {
-    const roundId = await vaultContract.get_current_round_id();
-    const roundAddress = await vaultContract.get_round_address(roundId);
+    try {
+      // Get current round ID from vault
+      const roundId = await vaultContract.get_current_round_id();
+      
+      // Get round address from vault using the round ID
+      const roundAddress = await vaultContract.get_round_address(roundId);
+      
+      // Create round contract to get the state
+      const roundContract = this.createRoundContract(roundAddress);
+      const state = await roundContract.get_state();
 
-    // Convert decimal address to hex
-    const roundAddressHex = "0x" + BigInt(roundAddress).toString(16);
-    
-    const roundContract = this.createRoundContract(roundAddressHex);
-    const stateRaw = await roundContract.get_state();
-    const state = (stateRaw as CairoCustomEnum).activeVariant();
-    const stateEnum = OptionRoundState[state as keyof typeof OptionRoundState];
+      return {
+        roundId: Number(roundId),
+        roundAddressHex: roundAddress,
+        state: Number(state)
+      };
+    } catch (error) {
+      throw new Error(`Failed to get round info: ${error}`);
+    }
+  }
 
-    return {
-      roundId,
-      roundAddress: roundAddress.toString(),
-      roundAddressHex,
-      state: stateEnum
-    };
+  async getLatestBlockTimestamp(): Promise<number> {
+    try {
+      const block = await this.provider.getBlock("latest");
+      return block.timestamp;
+    } catch (error) {
+      throw new Error(`Failed to get latest block timestamp: ${error}`);
+    }
   }
 
   async estimateTransactionFee(
     contractAddress: string,
-    entrypoint: string,
+    functionName: string,
     calldata: any[] = []
   ): Promise<bigint> {
-    const { suggestedMaxFee } = await this.account.estimateInvokeFee({
-      contractAddress,
-      entrypoint,
-      calldata,
-    });
-    return suggestedMaxFee;
+    try {
+      const { suggestedMaxFee } = await this.account.estimateInvokeFee({
+        contractAddress,
+        entrypoint: functionName,
+        calldata
+      });
+      return BigInt(suggestedMaxFee);
+    } catch (error) {
+      throw new Error(`Failed to estimate transaction fee: ${error}`);
+    }
   }
 
   async waitForTransaction(transactionHash: string): Promise<void> {
-    await this.provider.waitForTransaction(transactionHash);
+    try {
+      await this.provider.waitForTransaction(transactionHash);
+    } catch (error) {
+      throw new Error(`Failed to wait for transaction ${transactionHash}: ${error}`);
+    }
   }
 } 

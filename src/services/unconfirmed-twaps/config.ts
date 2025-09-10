@@ -1,5 +1,6 @@
-export interface UnconfirmedIndexerConfig {
-  mainnetRpcUrl: string;
+import { RPCConfig } from "../../shared/types";
+
+export interface UnconfirmedIndexerConfig extends RPCConfig {
   useDemoData: boolean;
   twapRanges: {
     TWELVE_MIN: number;

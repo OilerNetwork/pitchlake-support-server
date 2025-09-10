@@ -63,4 +63,9 @@ export enum OptionRoundState {
   Auctioning = 1,
   Running = 2,
   Settled = 3
+}
+
+// RPC Client Types
+export interface RPCConfig {
+  mainnetRpcUrl: string;
 } 
