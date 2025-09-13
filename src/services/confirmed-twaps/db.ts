@@ -6,7 +6,7 @@ import {
 } from "./types";
 import { Client } from "pg";
 import { TWAP_RANGES } from "./config";
-import { demoBlocks } from "@/shared/demoData";
+import { demoBlocks } from "../../shared/demoData";
 
 export class DatabaseService {
   private fossilClient?: Client;

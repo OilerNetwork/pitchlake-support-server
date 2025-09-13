@@ -3,7 +3,7 @@ import { FormattedBlockData } from "../confirmed-twaps/types";
 import { Logger } from "winston";
 import { formatRawToFossilRequest, formatTimeLeft } from "./utils";
 import { sendFossilRequest } from "./utils";
-import { StarknetBlock } from "@/types/types";
+import { StarknetBlock } from "../../types/types";
 
 export class StateHandlers {
   private logger: Logger;

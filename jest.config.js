@@ -14,7 +14,4 @@ module.exports = {
     '!src/**/*.d.ts',
     '!src/**/__tests__/**',
   ],
-  moduleNameMapping: {
-    '^@/(.*)$': '<rootDir>/src/$1',
-  },
 }; 

@@ -1,6 +1,5 @@
-import { FormattedBlockData } from "@/services/confirmed-twaps/types";
-import { StarknetBlock } from "@/types/types";
-import { Block } from "starknet";
+import {StarknetBlock} from "../types/types";
+import { Block } from "starknet"; 
 import { createPublicClient, http, PublicClient } from "viem";
 import { mainnet } from "viem/chains";
 

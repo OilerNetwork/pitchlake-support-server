@@ -1,4 +1,4 @@
-import { FossilRequest } from "@/types/types";
+import { FossilRequest } from "../../types/types";
 import axios from "axios";
 import { Contract } from "starknet";
 import { Logger } from "winston";

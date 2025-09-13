@@ -3,9 +3,8 @@ import { CairoCustomEnum, Contract, RpcProvider } from "starknet";
 import { ABI as OptionRoundAbi } from "../../abi/optionRound";
 import { Logger } from "winston";
 import { Account } from "starknet";
-import {  OptionRoundState, StarknetBlock } from "@/types/types";
-import { rpcToStarknetBlock } from "@/utils/rpcClient";
-import axios from "axios";
+import {  OptionRoundState, StarknetBlock } from "../../types/types";
+import { rpcToStarknetBlock } from "../../utils/rpcClient";
 import { StateHandlers } from "./stateHandlers";
 
 const {

@@ -2,8 +2,7 @@ import { RpcProvider } from "starknet";
 import { setupLogger } from "../../shared/logger";
 import { GasDataService } from "../confirmed-twaps/gasData";
 import { StateTransitionService } from "../state-transition/stateTransitionService";
-import { Logger } from "winston";
-import { rpcToStarknetBlock } from "@/utils/rpcClient";
+import { rpcToStarknetBlock } from "../../utils/rpcClient";
 
 
 export const runTWAPUpdate = () => async () => {
