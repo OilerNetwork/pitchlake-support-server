@@ -1,6 +1,6 @@
-import { FormattedBlockDataFossil } from "./types";
+import { FormattedBlockData } from "../services/confirmed-twaps/types";
 
-export const demoBlocks: FormattedBlockDataFossil[] = [
+export const demoBlocks: FormattedBlockData[] = [
   {
     blockNumber: 21527387,
     timestamp: 1735707423,

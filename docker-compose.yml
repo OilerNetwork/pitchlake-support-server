@@ -38,7 +38,7 @@ services:
       - ./.env:/app/.env:ro
     
     networks:
-      - architecture-network
+      - pitchlake-network
     
     depends_on:
       - fossil-db
@@ -58,7 +58,7 @@ services:
     ports:
       - "5432:5432"
     networks:
-      - architecture-network
+      - pitchlake-network
 
   pitchlake-db:
     image: postgres:15-alpine
@@ -74,12 +74,13 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - architecture-network
+      - pitchlake-network
 
 volumes:
   fossil_data:
   pitchlake_data:
 
 networks:
-  architecture-network:
+  pitchlake-network:
+    external: true
     driver: bridge 
