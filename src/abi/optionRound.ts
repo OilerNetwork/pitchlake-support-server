@@ -516,7 +516,7 @@ export const ABI = [
         "inputs": [],
         "outputs": [
           {
-            "type": "(core::integer::u256, core::integer::u256, core::integer::u64)"
+            "type": "(core::integer::u256, core::integer::u256)"
           }
         ],
         "state_mutability": "external"
@@ -532,7 +532,7 @@ export const ABI = [
         ],
         "outputs": [
           {
-            "type": "(core::integer::u256, core::integer::u256)"
+            "type": "core::integer::u256"
           }
         ],
         "state_mutability": "external"
@@ -541,10 +541,6 @@ export const ABI = [
         "type": "function",
         "name": "place_bid",
         "inputs": [
-          {
-            "name": "account",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
           {
             "name": "amount",
             "type": "core::integer::u256"
@@ -565,10 +561,6 @@ export const ABI = [
         "type": "function",
         "name": "update_bid",
         "inputs": [
-          {
-            "name": "account",
-            "type": "core::starknet::contract_address::ContractAddress"
-          },
           {
             "name": "bid_id",
             "type": "core::felt252"
@@ -603,7 +595,65 @@ export const ABI = [
       },
       {
         "type": "function",
+        "name": "exercise_options",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
         "name": "mint_options",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "external"
+      }
+    ]
+  },
+  {
+    "type": "impl",
+    "name": "ERC20Impl",
+    "interface_name": "openzeppelin_token::erc20::interface::IERC20"
+  },
+  {
+    "type": "enum",
+    "name": "core::bool",
+    "variants": [
+      {
+        "name": "False",
+        "type": "()"
+      },
+      {
+        "name": "True",
+        "type": "()"
+      }
+    ]
+  },
+  {
+    "type": "interface",
+    "name": "openzeppelin_token::erc20::interface::IERC20",
+    "items": [
+      {
+        "type": "function",
+        "name": "total_supply",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "balance_of",
         "inputs": [
           {
             "name": "account",
@@ -615,11 +665,117 @@ export const ABI = [
             "type": "core::integer::u256"
           }
         ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "allowance",
+        "inputs": [
+          {
+            "name": "owner",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "spender",
+            "type": "core::starknet::contract_address::ContractAddress"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "transfer",
+        "inputs": [
+          {
+            "name": "recipient",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
         "state_mutability": "external"
       },
       {
         "type": "function",
-        "name": "exercise_options",
+        "name": "transfer_from",
+        "inputs": [
+          {
+            "name": "sender",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "recipient",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "external"
+      },
+      {
+        "type": "function",
+        "name": "approve",
+        "inputs": [
+          {
+            "name": "spender",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
+          }
+        ],
+        "state_mutability": "external"
+      }
+    ]
+  },
+  {
+    "type": "impl",
+    "name": "ERC20CamelOnlyImpl",
+    "interface_name": "openzeppelin_token::erc20::interface::IERC20CamelOnly"
+  },
+  {
+    "type": "interface",
+    "name": "openzeppelin_token::erc20::interface::IERC20CamelOnly",
+    "items": [
+      {
+        "type": "function",
+        "name": "totalSupply",
+        "inputs": [],
+        "outputs": [
+          {
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "balanceOf",
         "inputs": [
           {
             "name": "account",
@@ -628,11 +784,446 @@ export const ABI = [
         ],
         "outputs": [
           {
-            "type": "(core::integer::u256, core::integer::u256, core::integer::u256)"
+            "type": "core::integer::u256"
+          }
+        ],
+        "state_mutability": "view"
+      },
+      {
+        "type": "function",
+        "name": "transferFrom",
+        "inputs": [
+          {
+            "name": "sender",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "recipient",
+            "type": "core::starknet::contract_address::ContractAddress"
+          },
+          {
+            "name": "amount",
+            "type": "core::integer::u256"
+          }
+        ],
+        "outputs": [
+          {
+            "type": "core::bool"
           }
         ],
         "state_mutability": "external"
       }
     ]
+  },
+  {
+    "type": "struct",
+    "name": "pitch_lake::option_round::interface::ConstructorArgs",
+    "members": [
+      {
+        "name": "vault_address",
+        "type": "core::starknet::contract_address::ContractAddress"
+      },
+      {
+        "name": "round_id",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "pricing_data",
+        "type": "pitch_lake::option_round::interface::PricingData"
+      },
+      {
+        "name": "round_transition_duration",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "auction_duration",
+        "type": "core::integer::u64"
+      },
+      {
+        "name": "round_duration",
+        "type": "core::integer::u64"
+      }
+    ]
+  },
+  {
+    "type": "constructor",
+    "name": "constructor",
+    "inputs": [
+      {
+        "name": "args",
+        "type": "pitch_lake::option_round::interface::ConstructorArgs"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::PricingDataSet",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "pricing_data",
+        "type": "pitch_lake::option_round::interface::PricingData",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::AuctionStarted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "starting_liquidity",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "options_available",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::BidPlaced",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "bid_id",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "price",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "bid_tree_nonce_now",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::BidUpdated",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "bid_id",
+        "type": "core::felt252",
+        "kind": "data"
+      },
+      {
+        "name": "price_increase",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "bid_tree_nonce_before",
+        "type": "core::integer::u64",
+        "kind": "data"
+      },
+      {
+        "name": "bid_tree_nonce_now",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::AuctionEnded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "options_sold",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "clearing_price",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "unsold_liquidity",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "clearing_bid_tree_nonce",
+        "type": "core::integer::u64",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::OptionRoundSettled",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "settlement_price",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "payout_per_option",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::OptionsExercised",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "total_options_exercised",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "mintable_options_exercised",
+        "type": "core::integer::u256",
+        "kind": "data"
+      },
+      {
+        "name": "exercised_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::UnusedBidsRefunded",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "refunded_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "struct",
+    "name": "pitch_lake::library::red_black_tree::RBTreeComponent::Node",
+    "members": [
+      {
+        "name": "value",
+        "type": "pitch_lake::types::Bid"
+      },
+      {
+        "name": "left",
+        "type": "core::felt252"
+      },
+      {
+        "name": "right",
+        "type": "core::felt252"
+      },
+      {
+        "name": "parent",
+        "type": "core::felt252"
+      },
+      {
+        "name": "color",
+        "type": "core::bool"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::library::red_black_tree::RBTreeComponent::InsertEvent",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "node",
+        "type": "pitch_lake::library::red_black_tree::RBTreeComponent::Node",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::library::red_black_tree::RBTreeComponent::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "InsertEvent",
+        "type": "pitch_lake::library::red_black_tree::RBTreeComponent::InsertEvent",
+        "kind": "nested"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::OptionsMinted",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "account",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "minted_amount",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_token::erc20::erc20::ERC20Component::Transfer",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "from",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "to",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_token::erc20::erc20::ERC20Component::Approval",
+    "kind": "struct",
+    "members": [
+      {
+        "name": "owner",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "spender",
+        "type": "core::starknet::contract_address::ContractAddress",
+        "kind": "key"
+      },
+      {
+        "name": "value",
+        "type": "core::integer::u256",
+        "kind": "data"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "openzeppelin_token::erc20::erc20::ERC20Component::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "Transfer",
+        "type": "openzeppelin_token::erc20::erc20::ERC20Component::Transfer",
+        "kind": "nested"
+      },
+      {
+        "name": "Approval",
+        "type": "openzeppelin_token::erc20::erc20::ERC20Component::Approval",
+        "kind": "nested"
+      }
+    ]
+  },
+  {
+    "type": "event",
+    "name": "pitch_lake::option_round::contract::OptionRound::Event",
+    "kind": "enum",
+    "variants": [
+      {
+        "name": "PricingDataSet",
+        "type": "pitch_lake::option_round::contract::OptionRound::PricingDataSet",
+        "kind": "nested"
+      },
+      {
+        "name": "AuctionStarted",
+        "type": "pitch_lake::option_round::contract::OptionRound::AuctionStarted",
+        "kind": "nested"
+      },
+      {
+        "name": "BidPlaced",
+        "type": "pitch_lake::option_round::contract::OptionRound::BidPlaced",
+        "kind": "nested"
+      },
+      {
+        "name": "BidUpdated",
+        "type": "pitch_lake::option_round::contract::OptionRound::BidUpdated",
+        "kind": "nested"
+      },
+      {
+        "name": "AuctionEnded",
+        "type": "pitch_lake::option_round::contract::OptionRound::AuctionEnded",
+        "kind": "nested"
+      },
+      {
+        "name": "OptionRoundSettled",
+        "type": "pitch_lake::option_round::contract::OptionRound::OptionRoundSettled",
+        "kind": "nested"
+      },
+      {
+        "name": "OptionsExercised",
+        "type": "pitch_lake::option_round::contract::OptionRound::OptionsExercised",
+        "kind": "nested"
+      },
+      {
+        "name": "UnusedBidsRefunded",
+        "type": "pitch_lake::option_round::contract::OptionRound::UnusedBidsRefunded",
+        "kind": "nested"
+      },
+      {
+        "name": "BidTreeEvent",
+        "type": "pitch_lake::library::red_black_tree::RBTreeComponent::Event",
+        "kind": "flat"
+      },
+      {
+        "name": "OptionsMinted",
+        "type": "pitch_lake::option_round::contract::OptionRound::OptionsMinted",
+        "kind": "nested"
+      },
+      {
+        "name": "ERC20Event",
+        "type": "openzeppelin_token::erc20::erc20::ERC20Component::Event",
+        "kind": "flat"
+      }
+    ]
   }
-] as const; 
+] as const;
