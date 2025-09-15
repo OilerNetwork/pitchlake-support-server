@@ -1,45 +1,46 @@
+import { RpcProvider } from "starknet";
 import { setupLogger } from "../../shared/logger";
-import { StateTransitionService } from "../state-transition";
-import { Logger } from "winston";
-export const runStateTransition = (logger: Logger) => async () => {
-  const { VAULT_ADDRESSES } = process.env;
-  if (!VAULT_ADDRESSES) return;
-  const vaultAddresses = VAULT_ADDRESSES.split(",").map((addr) => addr.trim());
+import { GasDataService } from "../confirmed-twaps/gasData";
+import { StateTransitionService } from "../state-transition/stateTransitionService";
+import { rpcToStarknetBlock } from "../../utils/rpcClient";
 
-  const services: StateTransitionService[] = [];
-  // Create services for each vault
-  logger.info("Creating services for all Vaults");
-  vaultAddresses.forEach((vaultAddress) => {
-    try {
-      const logger = setupLogger(`Vault ${vaultAddress.slice(0, 7)}`);
-      logger.info("New vault, address", { vaultAddress });
-      const newService = new StateTransitionService(vaultAddress, logger);
-      services.push(newService);
-    } catch (error) {
-      logger.info("Failed to create service for vault", { vaultAddress });
+
+export const runTWAPUpdate = () => async () => {
+  const service = new GasDataService();
+  // if (isJobRunning) {
+  //   console.log(
+  //     `Previous job is still running at ${new Date().toISOString()}, skipping this run`
+  //   );
+  //   return;
+  // }
+
+  console.log(`\nRunning TWAP update job at ${new Date().toISOString()}`);
+  // isJobRunning = true;
+
+  try {
+    const latestBlock = await service.updateTWAPs();
+    console.log("Latest block:", latestBlock);
+    console.log(`TWAP update job completed at ${new Date().toISOString()}, running state transition`);
+
+    if(!latestBlock) {
+      console.error("No latest block found");
+      return;
     }
-  });
-  if (services.length===0){
-    logger.info("No vault services created, returning early")
-    return
+
+    const { STARKNET_RPC } = process.env;
+    const provider = new RpcProvider({ nodeUrl: STARKNET_RPC });
+    const latestBlockStarknet = await provider.getBlock('latest');
+    if(!latestBlockStarknet) {
+      console.error("No latest block found");
+      return;
+    }
+    const latestBlockStarknetFormatted = rpcToStarknetBlock(latestBlockStarknet);
+    const logger = setupLogger('State Transition');
+    const stateTransitionService = new StateTransitionService(latestBlock, latestBlockStarknetFormatted, logger, provider);
+    await stateTransitionService.runStateTransition();
+  } catch (error) {
+    console.error("Error in TWAP update job:", error);
+  } finally {
+    // isJobRunning = false;
   }
-  const results = await Promise.allSettled(
-    services.map((service) =>
-      service.checkAndTransition().catch((error) => {
-        logger.error(
-          `Error in state transition check for vault ${service.getVaultAddress()}:`,
-          error
-        );
-        return Promise.reject(error);
-      })
-    )
-  );
-
-  const failures = results.filter((r) => r.status === "rejected").length;
-  const successes = results.filter((r) => r.status === "fulfilled").length;
-  logger.info(
-    `State transition checks completed. Successes: ${successes}, Failures: ${failures}`
-  );
 };
-
-const scheduleFossilTwapUpdate = () => {};

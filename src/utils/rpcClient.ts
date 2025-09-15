@@ -1,11 +1,13 @@
+import {StarknetBlock} from "../types/types";
+import { Block } from "starknet"; 
 import { createPublicClient, http, PublicClient } from "viem";
 import { mainnet } from "viem/chains";
-import { RPCConfig } from "../shared/types";
+
 
 export class RPCClient {
   private client: PublicClient;
 
-  constructor(config: RPCConfig) {
+  constructor(config:any) {
     this.client = createPublicClient({
       chain: mainnet,
       transport: http(config.mainnetRpcUrl),
@@ -36,3 +38,12 @@ export class RPCClient {
     return blocks;
   }
 } 
+
+
+export const rpcToStarknetBlock = (block: Block): StarknetBlock => {
+  return {
+    blockNumber: Number(block.block_number),
+    timestamp: Number(block.timestamp),
+
+  };
+};

@@ -2,9 +2,9 @@ import * as dotenv from "dotenv";
 import { setupLogger } from './shared/logger';
 import * as cron from 'node-cron';
 import { UnconfirmedTWAPsRunner } from "./services/unconfirmed-twaps";
-import { runStateTransition } from "./services/scheduler/scheduler";
 
 dotenv.config()
+import { runTWAPUpdate } from "./services/scheduler/scheduler";
 const logger = setupLogger('Main');
 
 
@@ -13,22 +13,12 @@ class ArchitectureSupportServer {
   
 
   constructor() {
-    // Example of how to schedule a cron job:
-    // cron.schedule('0 */6 * * *', () => {
-    //   // Your job logic here - runs every 6 hours
-    //   logger.info('Example cron job running...');
-    // });
-    
-    // cron.schedule('0 2 * * *', () => {
-    //   // Your job logic here - runs daily at 2 AM
-    //   logger.info('Daily job running...');
-    // });
   }
 
   async start(): Promise<void> {
     const {
-      USE_DEMO_DATA,
       CRON_SCHEDULE_STATE,
+      CRON_SCHEDULE_TWAP,
   } = process.env;
   
   // Validate environment variables and set up services
@@ -39,15 +29,14 @@ class ArchitectureSupportServer {
 
       // Start all services, if a scheduled job should auto run on startup, add it here
       await Promise.all([
-        runner.initialize(),
-        runStateTransition(logger)()
+        runner.initialize()
       ]);
 
       logger.info('All services started successfully');
       runner.startListening();
 
       //Schedule cron
-      cron.schedule(CRON_SCHEDULE_STATE as string, runStateTransition(logger) );
+      cron.schedule(CRON_SCHEDULE_TWAP as string, runTWAPUpdate() );
       
 
       // Handle graceful shutdown
